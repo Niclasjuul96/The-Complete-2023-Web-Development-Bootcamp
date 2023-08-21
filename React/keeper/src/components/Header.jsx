@@ -3,10 +3,11 @@ import HighlightIcon from "@material-ui/icons/Highlight";
 
 function Header() {
   return (
+    
     <header>
       <h1>
         <HighlightIcon />
-        Keeper
+        NoteEase
       </h1>
     </header>
   );

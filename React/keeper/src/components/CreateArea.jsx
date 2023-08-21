@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import AddIcon from "@material-ui/icons/Add";
 import Fab from "@material-ui/core/Fab";
 import Zoom from "@material-ui/core/Zoom";
@@ -23,11 +23,18 @@ function CreateArea(props) {
   }
 
   function submitNote(event) {
-    props.onAdd(note);
-    setNote({
-      title: "",
-      content: ""
-    });
+    if (note.title !== "" && note.content !== "") {
+      props.onAdd(note);
+      setNote({
+        title: "",
+        content: ""
+      });
+
+      //save notes data to local storage
+      const existingNotes = JSON.parse(localStorage.getItem("notes")) || [];
+      const updatedNotes = [...existingNotes, note];
+      localStorage.setItem("notes", JSON.stringify(updatedNotes));
+    } 
     event.preventDefault();
   }
 
@@ -35,13 +42,21 @@ function CreateArea(props) {
     setExpanded(true);
   }
 
+  const contentRef = useRef(null);
+
   return (
     <div>
       <form className="create-note">
         {isExpanded && (
-          <input
+          <input 
             name="title"
             onChange={handleChange}
+            onKeyDown={(event) => {
+              if(event.key === "Enter"){
+                event.preventDefault();
+                contentRef.current.focus();
+              }
+            }}
             value={note.title}
             placeholder="Title"
           />
@@ -54,6 +69,7 @@ function CreateArea(props) {
           value={note.content}
           placeholder="Take a note..."
           rows={isExpanded ? 3 : 1}
+          ref={contentRef}
         />
         <Zoom in={isExpanded}>
           <Fab onClick={submitNote}>
